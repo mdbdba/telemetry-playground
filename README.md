@@ -1,5 +1,11 @@
 # Example
 
+Changes made to original:
+   Loki runs in multitenant (loki1 and loki2) 
+   grafana agent has two log configs for the logs to send to both spots
+   There are two basic auth nginx proxies to see how that works.
+
+
 This directory contains a Docker Compose 3 environment that can be used to test
 Grafana Agent.
 
@@ -56,3 +62,33 @@ dashboards:
 * The `Agent Operational` dashboard shows resource consumption of Grafana
   Agent. Not all panels will have data here, as they rely on metrics from other
   sources (i.e., cAdvisor).
+
+
+## Test inserting into different tenants
+These commands insert examples 1&3 directly to loki
+```
+# build the epoch timestamp
+ts=$(printf "%s000000000000" $(date '+%s') |cut -c1-19)
+# plug that value into the data for the curl cmd
+dr="{\"streams\": [{ \"stream\": { \"foo\": \"bar\" }, \"values\": [ [ \"$ts\", \"example1\" ] ] }]}"
+curl --header "X-Scope-OrgID: loki1"  -X POST http://localhost:3100/loki/api/v1/push -H "Content-Type: application/json" --data-raw $dr
+dr="{\"streams\": [{ \"stream\": { \"foo\": \"bar\" }, \"values\": [ [ \"$ts\", \"example3\" ] ] }]}"
+curl --header "X-Scope-OrgID: loki2"  -X POST http://localhost:3100/loki/api/v1/push -H "Content-Type: application/json" --data-raw $dr
+```
+## Test inserting through the proxies
+These commands insert examples 2&4 by way of the proxies
+```
+# build the epoch timestamp
+ts=$(printf "%s000000000000" $(date '+%s') |cut -c1-19)
+# plug that value into the data for the curl cmd
+dr="{\"streams\": [{ \"stream\": { \"foo\": \"bar\" }, \"values\": [ [ \"$ts\", \"example2\" ] ] }]}"
+curl --header "Authorization: Basic bG9raTE6bG9raTFwQHNzdzByZCE="  --header "X-Scope-OrgID: loki1"  -X POST http://localhost:3100/loki/api/v1/push -H "Content-Type: application/json" --data-raw $dr
+dr="{\"streams\": [{ \"stream\": { \"foo\": \"bar\" }, \"values\": [ [ \"$ts\", \"example4\" ] ] }]}"
+curl --header "Authorization: Basic bG9raTI6bG9raTJwQHNzdzByZCE=" --header "X-Scope-OrgID: loki2"  -X POST http://localhost:3100/loki/api/v1/push -H "Content-Type: application/json" --data-raw $dr
+```
+## Query the test records
+Using any of the loki data sources:
+```
+{foo="bar"}
+```
+If things are set up right, you'll see different results in each of the loki data sources.

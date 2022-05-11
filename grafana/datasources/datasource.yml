@@ -13,6 +13,19 @@ datasources:
   isDefault: false
   version: 1
   editable: false
+- name: Cortex-apps
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://cortex:9009/api/prom
+  basicAuth: false
+  isDefault: false
+  version: 1
+  editable: false
+  jsonData:
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'apps'
 - name: Tempo
   type: tempo
   access: proxy
@@ -39,4 +52,42 @@ datasources:
         matcherRegex: tid=(\w+)
         name: TraceID
         url: $${__value.raw}
-
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'fake'
+- name: Loki1
+  type: loki
+  access: proxy
+  orgId: 1
+  url: http://loki:3100
+  basicAuth: false
+  isDefault: false
+  version: 1
+  editable: false
+  jsonData:
+    derivedFields:
+      - datasourceUid: tempo
+        matcherRegex: tid=(\w+)
+        name: TraceID
+        url: $${__value.raw}
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'loki1'
+- name: Loki2
+  type: loki
+  access: proxy
+  orgId: 1
+  url: http://loki:3100
+  basicAuth: false
+  isDefault: false
+  version: 1
+  editable: false
+  jsonData:
+    derivedFields:
+      - datasourceUid: tempo
+        matcherRegex: tid=(\w+)
+        name: TraceID
+        url: $${__value.raw}
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'loki2'
