@@ -9,6 +9,8 @@ Changes made from the original example (and if that's what you're really looking
      * for Cortex, the first one, autoscrape, was created to show how the autoscrape integration works and what data it collects.  The another, avalanche, shows the metrics coming from that load generator.  There is a fake one defined as well with no data.
    * Grafana agent has two log configs so that each set of logs get send to with the correct tenant id (X-Scope-OrgID).
    * There are two nginx proxies, loki1auth and loki2auth, to demonstrate how basic auth works.
+   * In Grafana, the data source definitions for tenents have been added. So, although the two that came with this originally (Cortex and Loki) will work (we've added the "fake" tenent to them), they should not find any data.
+   * Tempo and it's data source in grafana have been set up with the backend search enabled, because that's a requirement.
 
 ## Overall Setup
 
