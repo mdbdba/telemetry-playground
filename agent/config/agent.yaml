@@ -1,21 +1,6 @@
-# This file serves as an example agent configuration to interact with the
-# docker compose environment.
-#
-# You should pass the following command line flags when running the agent
-# locally and using this file:
-#
-#   -enable-features=integrations-next -config.expand-env -config.enable-read-api
-#
-# -enable-features=integrations-next is required as the file is configured for
-# the integrations revamp.
-#
-# -config.expand-env is required to expand environment variables. Environment
-# variables are used when running the agent inside of docker-compose to connect
-# to the other services. When running the agent externally, the expressions will
-# default to the appropriate values of the exposed ports.
-#
-# -config.enable-read-api is optional, but allows you to invoke the /-/config
-# endpoint to examine the generated config.
+# This is an agent configuration for a sample telemetry stack in a docker compose environment.
+# fire it up with `docker compose --profile=agent up -d`
+
 
 server:
   log_level: debug
@@ -25,25 +10,33 @@ metrics:
     scrape_interval: 60s
 
   configs:
+  # This one looks empty, right?  Have a look down below at the autoscrape integration.
+  # That's what this is being used for.
   - name: default
-    scrape_configs:
-    - job_name: apps
-      static_configs:
-      - targets: ['${AVALANCHE_HOST:-localhost:9001}']
     remote_write:
       - url: http://${REMOTE_WRITE_HOST:-localhost:9009}/api/prom/push
         headers:
-          X-Scope-OrgID: apps
+          X-Scope-OrgID: autoscrape
 
+  - name: avalanche
+    scrape_configs:
+      - job_name: avalanche
+        static_configs:
+          - targets: ['${AVALANCHE_HOST:-localhost:9001}']
+    remote_write:
+      - url: http://${REMOTE_WRITE_HOST:-localhost:9009}/api/prom/push
+        headers:
+          X-Scope-OrgID: avalanche
 logs:
   configs:
   - name: loki1
     clients:
-      - url: http://${LOKI_HOST:-localhost:3100}/loki/api/v1/push
-#      - url: http://localhost:8880/loki/api/v1/push
-#        basic_auth:
-#          username: loki1
-#          password: loki1p@ssw0rd!
+#      - url: http://${LOKI_HOST:-localhost:3100}/loki/api/v1/push
+#     Use the basic auth nginx proxy
+      - url: http://loki1auth:80/loki/api/v1/push
+        basic_auth:
+          username: loki1
+          password: loki1p@ssw0rd!
         tenant_id: loki1
 
     positions:
@@ -59,7 +52,12 @@ logs:
 
   - name: loki2
     clients:
-      - url: http://${LOKI_HOST:-localhost:3100}/loki/api/v1/push
+      # - url: http://${LOKI_HOST:-localhost:3100}/loki/api/v1/push
+      #     Use the basic auth nginx proxy
+      - url: http://loki2auth:80/loki/api/v1/push
+        basic_auth:
+          username: loki2
+          password: loki2p@ssw0rd!
         tenant_id: loki2
 
     positions:

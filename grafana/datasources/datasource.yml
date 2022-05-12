@@ -13,7 +13,11 @@ datasources:
   isDefault: false
   version: 1
   editable: false
-- name: Cortex-apps
+  jsonData:
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'fake'
+- name: CortexAutoscrape
   type: prometheus
   access: proxy
   orgId: 1
@@ -25,7 +29,20 @@ datasources:
   jsonData:
     httpHeaderName1: 'X-Scope-OrgID'
   secureJsonData:
-    httpHeaderValue1: 'apps'
+    httpHeaderValue1: 'autoscrape'
+- name: CortexAvalanche
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: http://cortex:9009/api/prom
+  basicAuth: false
+  isDefault: false
+  version: 1
+  editable: false
+  jsonData:
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'avalanche'
 - name: Tempo
   type: tempo
   access: proxy

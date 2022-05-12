@@ -42,12 +42,9 @@ services:
 
   tempo:
     image: grafana/tempo:1.4.1
-    command:
-      - "-storage.trace.backend=local"                  # tell tempo where to permanently put traces
-      - "-storage.trace.local.path=/tmp/tempo/traces"
-      - "-storage.trace.wal.path=/tmp/tempo/wal"        # tell tempo where to store the wal
-      - "-auth.enabled=false"                           # disables the requirement for the X-Scope-OrgID header
-      - "-server.http-listen-port=3200"
+    command: "-config.file=/etc/tempo-config/tempo.yaml"
+    volumes:
+      - ./tempo/config:/etc/tempo-config
     ports:
       - "3200:3200"
 
@@ -75,6 +72,7 @@ services:
       - BASIC_USERNAME=loki2
       - BASIC_PASSWORD=loki2p@ssw0rd!
 
+  # Avalanche serves a text-based Prometheus metrics endpoint for load testing
   avalanche:
     image: quay.io/freshtracks.io/avalanche:latest
     command:
@@ -97,10 +95,8 @@ services:
       - agent
 
   #
-  # Optional Grafana Agent which can collect telemetry and send it to
-  # Loki/Cortex/Tempo.
-  #
-  # Enable with the "agent" profile.
+  # Give folks a chance to spec out docker compose's profile functionality.
+  # Enable the agent with the "agent" profile.
   #
 
   agent:

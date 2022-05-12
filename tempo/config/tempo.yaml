@@ -1,0 +1,13 @@
+auth_enabled: false
+search_enabled: true
+
+storage:
+  trace:
+    backend: local                  # tell tempo where to permanently put traces
+    local:
+      path: /tmp/tempo/traces
+    wal:
+      path: /tmp/tempo/wal        # tell tempo where to store the wal
+
+server:
+  http_listen_port: 3200

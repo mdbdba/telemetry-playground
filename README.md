@@ -1,13 +1,18 @@
-# Example
+# Docker Compose Telemetry Stack to play with
 
-Changes made to original:
-   Loki runs in multitenant (loki1 and loki2) 
-   grafana agent has two log configs for the logs to send to both spots
-   There are two basic auth nginx proxies to see how that works.
+This started life as one of the grafana agent examples.  It makes for a good spot to test out different configurations for any of the grafana products.
 
+Changes made from the original example (and if that's what you're really looking for, go clone https://github.com/grafana/agent/tree/main/example/docker-compose ):
+   * Updated all of the components (agent, loki, cortex, and tempo) to their latest versions.
+   * Both Loki and Cortex are running in a multitenant configuration
+     * for Loki: fake, loki1, and loki2; fake should be empty, while both of the other tenants are pulling in the same dataset.  This was done so that we can play with pipelines in one of them and compare back without a bunch of fuss.
+     * for Cortex, the first one, autoscrape, was created to show how the autoscrape integration works and what data it collects.  The another, avalanche, shows the metrics coming from that load generator.  There is a fake one defined as well with no data.
+   * Grafana agent has two log configs so that each set of logs get send to with the correct tenant id (X-Scope-OrgID).
+   * There are two nginx proxies, loki1auth and loki2auth, to demonstrate how basic auth works.
 
-This directory contains a Docker Compose 3 environment that can be used to test
-Grafana Agent.
+## Overall Setup
+
+This directory contains a Docker Compose 3 environment that can be used to experiment with a telemetry stack with a fair set of features.
 
 By default, the following services are exposed:
 
@@ -15,20 +20,18 @@ By default, the following services are exposed:
 2. Grafana for visualizing telemetry (localhost:3000)
 3. Loki for storing logs (localhost:3100)
 4. Tempo for storing traces (localhost:3200)
-5. Avalanche for a sample /metrics endpoint to scrape (localhost:9001).
+5. Avalanche for a sample /metrics endpoint to scrape (localhost:9001)
+6. Loki1auth for demonstrating basic auth for the loki1 tenant (localhost:8880)
+7. Loki2auth for demonstrating basic auth for the loki2 tenant (localhost:8881)
 
 Run the following to bring up the environment:
 
 ```
-docker-compose up -d
+docker-compose --profile=agent up -d
 ```
 
 By default, the Docker Compose environment doesn't include a Grafana Agent
-container. This lets you test the agent externally, especially useful when
-validating code changes. You can enable the included Grafana Agent by passing
-`agent` to the profiles list: `docker compose --profile=agent up -d`. When
-running, the Agent exposes its HTTP endpoint at localhost:12345. This address
-can be changed with the `--server.http.address` flag (e.g.,
+container. That would let you test the agent externally. We are enabling the included Grafana Agent by passing`agent` to the profiles list: `docker compose --profile=agent up -d`. When running, the Agent exposes its HTTP endpoint at `localhost:12345`. This address can be changed with the `--server.http.address` flag (e.g.,
 `--server.http.address=127.0.0.1:8000`).
 
 The Docker Compose environment heavily relies on profiles to enable optional
