@@ -72,6 +72,21 @@ services:
       - BASIC_USERNAME=loki2
       - BASIC_PASSWORD=loki2p@ssw0rd!
 
+  loki3auth:
+    image: laurentbel/nginx-basic-auth
+    ports:
+      - "8882:80"
+    depends_on:
+      - loki
+    environment:
+      - FORWARD_HOST=loki
+      - FORWARD_PORT=3100
+      - BASIC_USERNAME=loki3
+      - BASIC_PASSWORD=loki3p@ssw0rd!
+
+
+
+
   # Avalanche serves a text-based Prometheus metrics endpoint for load testing
   avalanche:
     image: quay.io/freshtracks.io/avalanche:latest

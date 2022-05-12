@@ -5,10 +5,10 @@ This started life as one of the grafana agent examples.  It makes for a good spo
 Changes made from the original example (and if that's what you're really looking for, go clone https://github.com/grafana/agent/tree/main/example/docker-compose ):
    * Updated all of the components (agent, loki, cortex, and tempo) to their latest versions.
    * Both Loki and Cortex are running in a multitenant configuration
-     * for Loki: fake, loki1, and loki2; fake should be empty, while both of the other tenants are pulling in the same dataset.  This was done so that we can play with pipelines in one of them and compare back without a bunch of fuss.
+     * for Loki: fake, loki1, loki2, and loki3; fake should be empty, while loki1 has all logs, both of the other tenants are pulling in only a subset of data.  This was done so that we can demonstrate how a matcher works and for later, play with pipelines in one of them and compare back without a bunch of fuss.
      * for Cortex, the first one, autoscrape, was created to show how the autoscrape integration works and what data it collects.  The another, avalanche, shows the metrics coming from that load generator.  There is a fake one defined as well with no data.
    * Grafana agent has two log configs so that each set of logs get send to with the correct tenant id (X-Scope-OrgID).
-   * There are two nginx proxies, loki1auth and loki2auth, to demonstrate how basic auth works.
+   * There are two nginx proxies, loki1auth, loki2auth, and loki3auth, to demonstrate how basic auth works.
    * In Grafana, the data source definitions for tenents have been added. So, although the two that came with this originally (Cortex and Loki) will work (we've added the "fake" tenent to them), they should not find any data.
    * Tempo and it's data source in grafana have been set up with the backend search enabled, because that's a requirement.
 

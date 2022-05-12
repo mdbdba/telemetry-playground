@@ -108,3 +108,21 @@ datasources:
     httpHeaderName1: 'X-Scope-OrgID'
   secureJsonData:
     httpHeaderValue1: 'loki2'
+- name: Loki3
+  type: loki
+  access: proxy
+  orgId: 1
+  url: http://loki:3100
+  basicAuth: false
+  isDefault: false
+  version: 1
+  editable: false
+  jsonData:
+    derivedFields:
+      - datasourceUid: tempo
+        matcherRegex: tid=(\w+)
+        name: TraceID
+        url: $${__value.raw}
+    httpHeaderName1: 'X-Scope-OrgID'
+  secureJsonData:
+    httpHeaderValue1: 'loki3'
